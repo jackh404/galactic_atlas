@@ -16,7 +16,6 @@ class Seeder:
         Species.create_table()
         Civilization.create_tables()
 
-
         Star.create("Sol", "yellow dwarf", "A G-type main sequence star lovingly called the Sun",1392684,1988500000000000000)
         Star.create("Sarenrae", "yellow dwarf", "A G-type main sequence star that contains its own civilization known as 'The Burning Archipelago'",1392684,1988500000000000000)
         Star.create("Alpha Centauri", "star system", "A system of three stars: Rigil Kentaurus, Toliman, and Proxima Centauri",2.889e6,3.976e30)
@@ -47,3 +46,6 @@ class Seeder:
         Civilization.create("European Union", "continental", "A group of countries on the continent of Europe", "Christianity, Judaism, Islam, Hinduism","English, Spanish, French, German, Austrian", [1], [1])
         Civilization.create("The Pact Worlds","system-wide","A group of worlds that banded together when their solar system was invaded by the Vesk","Sarenrae, Iomadae, Pharasma","Common, Castrovellian, Eoxian, Elvish", [2,3], [2,3])
         Civilization.create("The Veskarium","system-wide","An Empire of Vesk that conqured their solar system and are still looking to expand.","Damoritosh","Common, Vesk", [4], [11,12])
+
+if __name__ == "__main__":
+    Seeder.main()

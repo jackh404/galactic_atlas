@@ -3,8 +3,9 @@ from models.planet import Planet
 from models.star import Star
 from models.species import Species
 from models.civilization import Civilization
+from seed_db import Seeder
 from time import sleep
-from sys import stdout
+from sys import stdout, exit
 
 title_string = """
   _______      ___       __           ___        ______ .___________. __    ______         ___      .___________. __           ___           _______.
@@ -22,8 +23,17 @@ title_array = ["  _______      ___       __           ___        ______ ._______
                "|  |__| |  /  _____  \  |  `----. /  _____  \  |  `----.    |  |     |  | |  `----.    /  _____  \      |  |     |  `----. /  _____  \  .----)   |   ",
                " \______| /__/     \__\ |_______|/__/     \__\  \______|    |__|     |__|  \______|   /__/     \__\     |__|     |_______|/__/     \__\ |_______/    "]
 
+def check_database():
+    try:
+        Star.get_all()
+        Planet.get_all()
+        Species.get_all()
+        Civilization.get_all()
+    except:
+        Seeder.main()
+
 def intro():
-    scan_print("Welcome to the...",0.1)
+    scan_print("Greetings Starfinder, and welcome to the",0.1)
     for line in title_array:
         scan_print(line,0.002)
     print()
@@ -32,7 +42,7 @@ def intro():
 
 
 def exit_program():
-    scan_print("Exit the Astral Plane!")
+    scan_print("Until next time, Starfinder.")
     exit()
 
 def scan_print(s,t=0.01):
@@ -132,22 +142,12 @@ def update_star():
                 mass = input("Enter the new mass in trillions of kilograms: ")
                 star.mass = mass
             star.update()
-            scan_print("Unleashing the star...from the dust")
-            scan_print("...\n",0.5)
-            scan_print(f"Star {name} added to star system!\n{star}")
+            scan_print("Star parameters successfully adjusted.")
         except Exception as e: 
-            scan_print(f"Error: {e}")
+            scan_print(f"Error updating Star: {e}")
             print()
             input("Press Enter to return to menu")
             print()
-                
-            type = input("Enter the new star type: ")
-            star.type = type
-            
-            star.update()
-            scan_print(f"BORN FROM THE ASHES:{star}")
-        except Exception as exc:
-            scan_print("Error updating: ", exc)
     else:
         scan_print("...",0.5)
         scan_print(f" Star {id_} not found")
@@ -166,12 +166,13 @@ def delete_star():
         print()
         return
     if star := Star.find_by_id(id_) :
-        scan_print(f'Delete star: {star.name}? (y/n): ')
+        starname = star.name
+        scan_print(f'Delete star: {starname}? (y/n): ')
         if "y" in input():
             star.delete()
             scan_print("Deploying black hole")
             scan_print("...\n",0.5)
-            scan_print(f"Star {id_} deleted")
+            scan_print(f"Star {starname} deleted")
     else:
         scan_print("...",0.5)
         scan_print(f"Star {id_} not found")
@@ -262,13 +263,13 @@ def create_planet():
                 break
             else:
                 if "Name" in e.__str__(): name = None
-                elif "Type" in e.__str__(): type = None
-                elif "Description" in e.__str__(): description = None
-                elif "Diameter" in e.__str__(): diameter = None
-                elif "Mass" in e.__str__(): mass = None
-                elif "Day" in e.__str__(): day = None
-                elif "Year" in e.__str__(): year = None
-                elif "Star" in e.__str__(): star = None
+                if "Type" in e.__str__(): type = None
+                if "Description" in e.__str__(): description = None
+                if "Diameter" in e.__str__(): diameter = None
+                if "Mass" in e.__str__(): mass = None
+                if "Day" in e.__str__(): day = None
+                if "Year" in e.__str__(): year = None
+                if "Star" in e.__str__(): star = None
                 planet = None
     print()
     input("Press Enter to return to menu")
@@ -303,9 +304,9 @@ def create_species():
                 break
             else:
                 if "Name" in e.__str__(): name = None
-                elif "Type" in e.__str__(): type = None
-                elif "Description" in e.__str__(): description = None
-                elif "Home World" in e.__str__(): home_world_id = None
+                if "Type" in e.__str__(): type = None
+                if "Description" in e.__str__(): description = None
+                if "Home World" in e.__str__(): home_world_id = None
                 species = None
     print()
     input("Press Enter to return to menu")
@@ -366,12 +367,12 @@ def create_civilization():
                 break
             else:
                 if "Name" in e.__str__(): name = None
-                elif "Type" in e.__str__(): type = None
-                elif "Description" in e.__str__(): description = None
-                elif "Religions" in e.__str__(): religions = None
-                elif "Languages" in e.__str__(): languages = None
-                elif "Species" in e.__str__(): species_ids = []
-                elif "Planets" in e.__str__(): planet_ids = []
+                if "Type" in e.__str__(): type = None
+                if "Description" in e.__str__(): description = None
+                if "Religions" in e.__str__(): religions = None
+                if "Languages" in e.__str__(): languages = None
+                if "Species" in e.__str__(): species_ids = []
+                if "Planets" in e.__str__(): planet_ids = []
                 civ = None
                 
     print()

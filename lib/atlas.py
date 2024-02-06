@@ -1,36 +1,9 @@
 #!/usr/bin/env python3
 #lib/atlas.py
-from helpers import (
-    exit_program,
-    list_stars,
-    find_star_by_type,
-    find_star_by_id,
-    create_star,
-    update_star,
-    delete_star,
-    list_planets,
-    find_planet_by_type,
-    find_planet_by_id,
-    create_planet,
-    update_planet,
-    delete_planet,
-    list_civilizations,
-    find_civilization_by_type,
-    find_civilization_by_id,
-    create_civilization,
-    update_civilization,
-    delete_civilization,
-    list_species,
-    find_species_by_type,
-    find_species_by_id,
-    create_species,
-    update_species,
-    delete_species,
-    intro,
-    scan_print
-)
+from helpers import *
     
 def main():
+    check_database()
     intro()
     while True:
         top_menu()
@@ -46,14 +19,14 @@ def main():
         elif choice == "4":
             civilization_menu()
         else:
-            print("BLACK HOLE OF NOTHINGNESS")
+            print("Incorrect choice, please try again.")
 
 
 def top_menu():
     scan_print(
         """Please select an option:
 _________________________________________________
-0. Exit the astral plane
+0. Exit the Atlas
 1. Browse Stars
 2. Browse Planets
 3. Browse Species
