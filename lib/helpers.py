@@ -6,22 +6,21 @@ from models.civilization import Civilization
 from seed_db import Seeder
 from time import sleep
 from sys import stdout, exit
+from os import system
 
 title_string = """
-  _______      ___       __           ___        ______ .___________. __    ______         ___      .___________. __           ___           _______.
- /  _____|    /   \     |  |         /   \      /      ||           ||  |  /      |       /   \     |           ||  |         /   \         /       |
-|  |  __     /  ^  \    |  |        /  ^  \    |  ,----'`---|  |----`|  | |  ,----'      /  ^  \    `---|  |----`|  |        /  ^  \       |   (----`
-|  | |_ |   /  /_\  \   |  |       /  /_\  \   |  |         |  |     |  | |  |          /  /_\  \       |  |     |  |       /  /_\  \       \   \    
-|  |__| |  /  _____  \  |  `----. /  _____  \  |  `----.    |  |     |  | |  `----.    /  _____  \      |  |     |  `----. /  _____  \  .----)   |   
- \______| /__/     \__\ |_______|/__/     \__\  \______|    |__|     |__|  \______|   /__/     \__\     |__|     |_______|/__/     \__\ |_______/    
-                                                                                                                                                                                                                                                                               
+   ____         _               _    _            _    _    _             
+  / ___|  __ _ | |  __ _   ___ | |_ (_)  ___     / \  | |_ | |  __ _  ___ 
+ | |  _  / _` || | / _` | / __|| __|| | / __|   / _ \ | __|| | / _` |/ __|
+ | |_| || (_| || || (_| || (__ | |_ | || (__   / ___ \| |_ | || (_| |\__ \
+  \____| \__,_||_| \__,_| \___| \__||_| \___| /_/   \_\\\__||_| \__,_||___/
+                                                                          
 """
-title_array = ["  _______      ___       __           ___        ______ .___________. __    ______         ___      .___________. __           ___           _______.",
-               " /  _____|    /   \     |  |         /   \      /      ||           ||  |  /      |       /   \     |           ||  |         /   \         /       |",
-               "|  |  __     /  ^  \    |  |        /  ^  \    |  ,----'`---|  |----`|  | |  ,----'      /  ^  \    `---|  |----`|  |        /  ^  \       |   (----`",
-               "|  | |_ |   /  /_\  \   |  |       /  /_\  \   |  |         |  |     |  | |  |          /  /_\  \       |  |     |  |       /  /_\  \       \   \    ",
-               "|  |__| |  /  _____  \  |  `----. /  _____  \  |  `----.    |  |     |  | |  `----.    /  _____  \      |  |     |  `----. /  _____  \  .----)   |   ",
-               " \______| /__/     \__\ |_______|/__/     \__\  \______|    |__|     |__|  \______|   /__/     \__\     |__|     |_______|/__/     \__\ |_______/    "]
+title_array = ["   ____         _               _    _            _    _    _              ",
+               "  / ___|  __ _ | |  __ _   ___ | |_ (_)  ___     / \  | |_ | |  __ _  ___  ",
+               " | |  _  / _` || | / _` | / __|| __|| | / __|   / _ \ | __|| | / _` |/ __| ",
+               " | |_| || (_| || || (_| || (__ | |_ | || (__   / ___ \| |_ | || (_| |\__ \ ",
+               "  \____| \__,_||_| \__,_| \___| \__||_| \___| /_/   \_\\\__||_| \__,_||___/ "]
 
 def check_database():
     try:
@@ -33,15 +32,18 @@ def check_database():
         Seeder.main()
 
 def intro():
-    scan_print("Greetings Starfinder, and welcome to the",0.1)
+    system('clear')
+    scan_print("Greetings Starfinder, and welcome to the",0.05)
     for line in title_array:
         scan_print(line,0.002)
     print()
     scan_print("Press Enter to continue")
     input()
+    system('clear')
 
 
 def exit_program():
+    system('clear')
     scan_print("Until next time, Starfinder.")
     exit()
 
@@ -52,13 +54,86 @@ def scan_print(s,t=0.01):
         sleep(t)
     print()
     
-def initialize_from_database():
-    Star.get_all()
-    Planet.get_all()
-    Species.get_all()
-    Civilization.get_all()
+def list_options(cat,name,option=None):
+    """Takes a category (either a list or a Class), the (singular) name of the category as a string, and an optional filter for use with entity types. It then produces a list of options for the user to choose from"""
+    system('clear')
+    scan_print(f"Please select a {name}{f' of Type {option}' if option else ''}:")
+    print("_________________________________________________")
+    scan_print("0: Back to Previous Menu")
+    if type(cat) is list:
+        i = 1
+        for option in cat:
+            scan_print(f'{i}: {option}')
+            i += 1
+    elif type(cat) is type:
+        if option:
+            things = cat.find_by_type(option)
+            for thing in things:
+                scan_print(f'{thing.id}: {thing.name}')
+        else:
+            things = cat.get_all()
+            for thing in things:
+                scan_print(f'{thing.id}: {thing.name}')
+                
+def pick_item(name,option=None):
+    """Takes the name of a class and an optional filter parameter, calls the list_options function to display a list of options for the user to choose from, then calls item_menu to display the interaction options for the selected item"""
+    system('clear')
+    list_options(name,name.__name__,option)
+    choice = input("=> ")
+    if choice != "0":
+        item_menu(name.find_by_id(int(choice)))
+    
+def item_menu(item):
+    while True:
+        system('clear')
+        scan_print(f"""
+<>  {item.name} | Please select an option:
+    _________________________________________________
+    0. Back to {type(item).__name__} menu
+    1. Update {item.name}
+    2. Delete {item.name}""",0.01)
+        choice = input("> ")
+        if choice == "0":
+            return
+        elif choice == "1":
+            update_item(item)
+        elif choice == "2":
+            delete_item(item)
+            
+def delete_item(item):
+    scan_print(f"Delete {item.name}? (y/n): ")
+    if 'y' in input("=> ").lower():
+        try:
+            item.delete()
+        except:
+            scan_print("Something went wrong")
+            
+def update_item(item):
+    if type(item) is Star:
+        update_star(item)
+    elif type(item) is Planet:
+        update_planet(item)
+    elif type(item) is Species:
+        update_species(item)
+    elif type(item) is Civilization:
+        update_civilization(item)
+    
+    
+    
+    
+
+
+
+
+
+
+
+
     
 def list_stars():
+    system('clear')
+    scan_print("Available stars:")
+    print("_________________________________________________")
     stars = Star.get_all()
     for star in stars:
         scan_print(f'{star.id}: {star.name}')
@@ -66,7 +141,7 @@ def list_stars():
 def find_star_by_type():
     type = input("Enter the star type:")
     star = Star.find_by_type(type)
-    print(star) if star else print(f"Star {type} not found")
+    scan_print(star) if star else print(f"Star {type} not found")
 
 def find_star_by_id():
     id_ = input("Enter the star's id: ")

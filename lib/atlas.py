@@ -1,30 +1,33 @@
 #!/usr/bin/env python3
 #lib/atlas.py
 from helpers import *
+from os import system
     
 def main():
     check_database()
     intro()
     while True:
         top_menu()
-        choice = input("> ")
+        choice = input("=> ")
         if choice == "0":
             exit_program()
         elif choice == "1":
-            star_menu()
+            browse(Star)
         elif choice == "2":
-            planet_menu()
+            browse(Planet)
         elif choice == "3":
-            species_menu()
+            browse(Species)
         elif choice == "4":
-            civilization_menu()
+            browse(Civilization)
         else:
             print("Incorrect choice, please try again.")
 
 
 def top_menu():
+    system('clear')
     scan_print(
-        """Please select an option:
+        """
+Please select an option:
 _________________________________________________
 0. Exit the Atlas
 1. Browse Stars
@@ -32,25 +35,67 @@ _________________________________________________
 3. Browse Species
 4. Browse Civilizations""",0.01
     )
-    
-def star_menu():
+
+def browse(name):
+    """Primary sub-menu for browsing entities individually or by type"""
     while True:
+        system('clear')
+        scan_print(f"""
+<>  {name.__name__} | Please select an option:
+    _________________________________________________
+    0. Back to main menu
+    1. List {name.__name__}s
+    2. Find {name.__name__}s by Type
+    3. Create {name.__name__}""",0.01)
+        choice = input("> ")
+        if choice == "0":
+            return
+        elif choice == "1":
+            pick_item(name)
+        elif choice == "2":
+            list_options(name.types,f'{name.__name__} Type')
+            choice = input("=> ")
+            if choice != "0":
+                pick_item(name,name.types[int(choice)-1])
+        elif choice == "3":
+            if name == Star:
+                create_star()
+            elif name == Planet:
+                create_planet()
+            elif name == Species:
+                create_species()
+            elif name == Civilization:
+                create_civilization()
+            else:
+                print("Something went wrong.")
+                return
+
+
+        
+
+
+
+
+
+
+
+    
+def stars_menu():
+    while True:
+        system('clear')
         scan_print(
-            """Please select an option:
+            """> Stars | Please select an option:
     _________________________________________________
     0. Back to main menu
     1. List Stars
-    2. Find Star by ID
-    3. Find Star by Type
-    4. Create Star
-    5. Update Star
-    6. Delete Star""",0.01
+    3. Find Stars by Type
+    4. Create Star""",0.01
         )
         choice = input("> ")
         if choice == "0":
             return
         elif choice == "1":
-            list_stars()
+            list_options(Star,"Star")
         elif choice == "2":
             find_star_by_id()
         elif choice == "3":
@@ -64,8 +109,9 @@ def star_menu():
             
 def planet_menu():
     while True:
+        system('clear')
         scan_print(
-            """Please select an option:
+            """> Planets | Please select an option:
     _________________________________________________
     0. Back to main menu
     1. List Planets
@@ -93,8 +139,9 @@ def planet_menu():
             
 def species_menu():
     while True:
+        system('clear')
         scan_print(
-            """Please select an option:
+            """> Species | Please select an option:
     _________________________________________________
     0. Back to main menu
     1. List Species
@@ -122,8 +169,9 @@ def species_menu():
             
 def civilization_menu():
     while True:
+        system('clear')
         scan_print(
-            """Please select an option:
+            """> Civilizations | Please select an option:
     _________________________________________________
     0. Back to main menu
     1. List Civilizations
