@@ -55,23 +55,27 @@ def scan_print(s,t=0.01):
     print()
     
 def list_options(cat,name,option=None):
-    """Takes a category (either a list or a Class), the (singular) name of the category as a string, and an optional filter for use with entity types. It then produces a list of options for the user to choose from"""
+    """Takes a category (either a list or a Class), the (singular) name of the category as a string, and an optional filter for use with entity types. It then asks the user to choose from items printed by list_items"""
     system('clear')
     scan_print(f"Please select a {name}{f' of Type {option}' if option else ''}:")
     print("_________________________________________________")
     scan_print("0: Back to Previous Menu")
-    if type(cat) is list:
+    list_items(cat,option)
+
+def list_items(items, option=None):
+    """Takes a list of items (either a list or a Class) and an optional filter for use with entity types. It then produces a list of options"""
+    if type(items) is list:
         i = 1
-        for option in cat:
-            scan_print(f'{i}: {option}')
+        for item in items:
+            scan_print(f'{i}: {item}')
             i += 1
-    elif type(cat) is type:
+    elif type(items) is type:
         if option:
-            things = cat.find_by_type(option)
+            things = items.find_by_type(option)
             for thing in things:
                 scan_print(f'{thing.id}: {thing.name}')
         else:
-            things = cat.get_all()
+            things = items.get_all()
             for thing in things:
                 scan_print(f'{thing.id}: {thing.name}')
                 
@@ -87,17 +91,22 @@ def item_menu(item):
     while True:
         system('clear')
         scan_print(f"""
-<>  {item.name} | Please select an option:
-    _________________________________________________
-    0. Back to {type(item).__name__} menu
-    1. Update {item.name}
-    2. Delete {item.name}""",0.01)
+<>  <>  {item.name} | Please select an option:
+        _________________________________________________
+        0. Back to {type(item).__name__} menu
+        1. View Details
+        2. Update {item.name}
+        3. Delete {item.name}""",0.01)
         choice = input("> ")
         if choice == "0":
             return
         elif choice == "1":
-            update_item(item)
+            print()
+            scan_print(item.__str__())
+            input("Press Enter to continue")
         elif choice == "2":
+            update_item(item)
+        elif choice == "3":
             delete_item(item)
             
 def delete_item(item):
@@ -107,8 +116,14 @@ def delete_item(item):
             item.delete()
         except:
             scan_print("Something went wrong")
+            input("Press Enter to continue")
             
 def update_item(item):
+    system('clear')
+    scan_print(f"""Updating {item.name}
+               _______________________________________________
+               {item.__str__()}
+               """)
     if type(item) is Star:
         update_star(item)
     elif type(item) is Planet:
@@ -119,35 +134,6 @@ def update_item(item):
         update_civilization(item)
     
     
-    
-    
-
-
-
-
-
-
-
-
-    
-def list_stars():
-    system('clear')
-    scan_print("Available stars:")
-    print("_________________________________________________")
-    stars = Star.get_all()
-    for star in stars:
-        scan_print(f'{star.id}: {star.name}')
-
-def find_star_by_type():
-    type = input("Enter the star type:")
-    star = Star.find_by_type(type)
-    scan_print(star) if star else print(f"Star {type} not found")
-
-def find_star_by_id():
-    id_ = input("Enter the star's id: ")
-    star = Star.find_by_id(int(id_))
-    scan_print(f'{star}') if star else print(f" Star {id_} not found")
-
 def create_star():
     star = None
     sname = None
@@ -159,7 +145,7 @@ def create_star():
         if not sname: sname = input("Enter the name of the new star: ")
         print()
         scan_print("Available star types: ")
-        list_types(Star)
+        list_items(Star.types)
         print()
         if not stype: stype = input("Enter the type number of the new star: ")
         stype = Star.types[int(stype)-1]
@@ -184,122 +170,40 @@ def create_star():
     input("Press Enter to return to menu")
                 
 
-def update_star():
-
-    id_ = input("Enter the star's id: ")
-    id_ = int(id_)
-    if star := Star.find_by_id(id_):
-        scan_print(f'{star}')
-        try:
-            ans = input("Change the star's name? (y/n): ")
-            if "y" in ans.lower():
-                name = input("Enter the star's new name: ")
-                star.name = name 
-            ans = input("Change the star type? (y/n): ")
-            if "y" in ans.lower():
-                print()
-                scan_print("Available star types:")
-                list_types(Star)
-                print()
-                typ = input("Enter the new type number for the star: ")
-                type = Star.types[int(typ)-1]
-                star.type = type
-            ans = input("Change the star's description? (y/n): ")
-            if "y" in ans.lower():
-                description = input("Enter the star's new description: ")
-                star.description = description
-            ans = input("Change the star's diameter? (y/n): ")
-            if "y" in ans.lower(): 
-                diameter = input("Enter the new diameter in kilometers: ")
-                star.diameter = diameter
-            ans = input("Change the star's mass? (y/n): ")
-            if "y" in ans.lower(): 
-                mass = input("Enter the new mass in trillions of kilograms: ")
-                star.mass = mass
-            star.update()
-            scan_print("Star parameters successfully adjusted.")
-        except Exception as e: 
-            scan_print(f"Error updating Star: {e}")
-            print()
-            input("Press Enter to return to menu")
-            print()
-    else:
-        scan_print("...",0.5)
-        scan_print(f" Star {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def delete_star():
-    id_ = input("Enter the star's id: ")
+def update_star(star):
     try:
-        id_ = int(id_)
-    except:
-        scan_print("Error: Star ID must be an integer")
+        ans = input("Change the star's name? (y/n): ")
+        if "y" in ans.lower():
+            name = input("Enter the star's new name: ")
+            star.name = name 
+        ans = input("Change the star type? (y/n): ")
+        if "y" in ans.lower():
+            print()
+            scan_print("Please select a star type:")
+            list_items(Star.types)
+            print()
+            typ = input("=> ")
+            type = Star.types[int(typ)-1]
+            star.type = type
+        ans = input("Change the star's description? (y/n): ")
+        if "y" in ans.lower():
+            description = input("Enter the star's new description: ")
+            star.description = description
+        ans = input("Change the star's diameter? (y/n): ")
+        if "y" in ans.lower(): 
+            diameter = input("Enter the new diameter in kilometers: ")
+            star.diameter = diameter
+        ans = input("Change the star's mass? (y/n): ")
+        if "y" in ans.lower(): 
+            mass = input("Enter the new mass in trillions of kilograms: ")
+            star.mass = mass
+        star.update()
+        scan_print("Star parameters successfully adjusted.")
+        input("Press Enter to return to menu")
+    except Exception as e: 
+        scan_print(f"Error updating Star: {e}")
         print()
         input("Press Enter to return to menu")
-        print()
-        return
-    if star := Star.find_by_id(id_) :
-        starname = star.name
-        scan_print(f'Delete star: {starname}? (y/n): ')
-        if "y" in input():
-            star.delete()
-            scan_print("Deploying black hole")
-            scan_print("...\n",0.5)
-            scan_print(f"Star {starname} deleted")
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Star {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-
-def list_planets():
-    planets = Planet.get_all()
-    for planet in planets :
-        scan_print(f'{planet.id}: {planet.name}')
-        
-def list_species():
-    species = Species.get_all()
-    for species in species :
-        scan_print(f'{species.id}: {species.name}')
-        
-def list_civilizations():
-    civs = Civilization.get_all()
-    for civ in civs :
-        scan_print(f'{civ.id}: {civ.name}')
-        
-def find_planet_by_type():
-    print()
-    scan_print("Available planet types:")
-    list_types(Planet)
-    print()
-    typ = input("Enter the type number to search: ")
-    type = Planet.types[int(typ)-1]
-    planets = Planet.find_by_type(type)
-    if planets:
-        scan_print(f"Planets of type '{type}':")
-        for planet in planets :
-            scan_print(f'{planet.id}: {planet.name}')
-    else:
-        print(f"No planets of type {type} found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-
-def find_planet_by_id():
-    id_ = input("Enter the planet's id: ")
-    id_ = int(id_)
-    planet = Planet.find_by_id(id_)
-    print(planet) if planet else print(f"Planet {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def list_types(cls):
-    for i, t in enumerate(cls.types):
-        print(f"{i+1}. {t}")
 
 def create_planet():
     planet = None
@@ -315,7 +219,7 @@ def create_planet():
         if not name: name = input("Enter the name of the new planet: ")
         print()
         scan_print("Available planet types:")
-        list_types(Planet)
+        list_items(Planet.types)
         print()
         if not type: ptype = input("Enter the type number of the new planet: ")
         type = Planet.types[int(ptype)-1]
@@ -325,8 +229,8 @@ def create_planet():
         if not day: day = input("Enter the day length of the new planet in Earth days: ")
         if not year: year = input("Enter the year length of the new planet in Earth years: ")
         print()
-        scan_print("Available stars:")
-        list_stars()
+        # scan_print("Available stars:")
+        list_options(Star, "Star")
         print()
         star = input("Enter the star ID of the new planet: ")
         try:
@@ -360,16 +264,17 @@ def create_species():
         if not name: name = input("Enter the name of the new species: ")
         print()
         scan_print("Available species types:")
-        list_types(Species)
+        list_items(Species.types)
         print()
         if not type: type = input("Enter the type number of the new species: ")
         type = Species.types[int(type)-1]
         if not description: description = input("Enter the description of the new species: ")
         print()
-        scan_print("Available planets:")
-        list_planets()
-        print()
-        if not home_world_id: home_world_id = input("Enter the home world ID of the new species: ")
+        if not home_world_id: 
+            scan_print("Please select a home world for the new species:")
+            list_items(Planet)
+            print()
+            home_world_id = input("=> ")
         try:
             species = Species.create(name, type, description, int(home_world_id))
             scan_print(f"Species {name} created successfully!\n{species}")
@@ -399,21 +304,23 @@ def create_civilization():
     while(not civ):
         if not name: name = input("Enter the name of the new civilization: ")
         print()
-        scan_print("Available civilization types:")
-        list_types(Civilization)
-        print()
-        if not type: type = input("Enter the type number of the new civilization: ")
-        type = Civilization.types[int(type)-1]
+        if not type: 
+            scan_print("Please choose the type of the new civilization:")
+            list_items(Civilization.types)
+            print()
+            type = input("=> ")
+            type = Civilization.types[int(type)-1]
         if not description: description = input("Enter the description of the new civilization: ")
         if not religions: religions = input("Enter the major religions of the new civilization separated by commas: ")
         if not languages: languages = input("Enter the major languages of the new civilization separated by commas: ")
         if not species_ids: 
             while True:
                 print()
-                scan_print("Available Species:")
-                list_species()
+                scan_print("Select species from the list one at a time to be a part of the new civilization:")
+                scan_print("0: Done adding species")
+                list_items(Species)
                 print()
-                id_ = input("Enter the ID of a species in the new civilization or press Enter to continue: ")
+                id_ = input("=> ")
                 if id_:
                     id_ = int(id_)
                     if id_ not in species_ids:
@@ -423,10 +330,11 @@ def create_civilization():
         if not planet_ids: 
             while True:
                 print()
-                scan_print("Available Planets:")
-                list_planets()
+                scan_print("Select planets from the list one at a time to be a part of the new civilization:")
+                scan_print("0: Done adding planets")
+                list_items(Planet)
                 print()
-                id_ = input("Enter the ID of a planet in the new civilization or press Enter to continue: ")
+                id_ = input("=> ")
                 if id_:
                     id_ = int(id_)
                     if id_ not in planet_ids:
@@ -454,286 +362,153 @@ def create_civilization():
     input("Press Enter to return to menu")
     print()
     
-def update_civilization():
-    list_civilizations()
-    id_ = input("Enter the civilization's id: ")
+def update_civilization(civ):
     try:
-        if civ := Civilization.find_by_id(int(id_)):
-            print(civ)
-            ans = input("Change the civilization's name? (y/n): ")
-            if "y" in ans.lower():
-                name = input("Enter the civilizations's new name: ")
-                civ.name = name
-            ans = input("Change the civilizations's type? (y/n): ")
-            if "y" in ans.lower():
+        ans = input("Change the civilization's name? (y/n): ")
+        if "y" in ans.lower():
+            name = input("Enter the civilizations's new name: ")
+            civ.name = name
+        ans = input("Change the civilizations's type? (y/n): ")
+        if "y" in ans.lower():
+            print()
+            scan_print("Please choose the type of the new civilization:")
+            list_items(Civilization.types)
+            print()
+            input("=> ")
+            type = Civilization.types[int(type)-1]
+            civ.type = type
+        ans = input("Change the civilizations's description? (y/n): ")
+        if "y" in ans.lower():
+            description = input("Enter the new description: ")
+            civ.description = description
+        ans = input("Change the civilizations's major religions? (y/n): ")
+        if "y" in ans.lower():
+            religions = input("Enter the new major religions separated by commas: ")
+            civ.religions = religions
+        ans = input("Change the civilizations's major languages? (y/n): ")
+        if "y" in ans.lower():
+            languages = input("Enter the new major languages separated by commas: ")
+            civ.languages = languages
+        ans = input("Change the civilizations's species? You will need to enter the ID of each species again. (y/n): ")
+        if "y" in ans.lower():
+            civ.species_ids = []
+            while True:
                 print()
-                scan_print("Available civilization types:")
-                list_types(Civilization)
+                scan_print("Choose species from the list one at a time to be a part of the civilization:")
+                scan_print("0: Done adding species")
+                list_items(Species)
                 print()
-                input("Enter the new type number for the civilization: ")
-                type = Civilization.types[int(type)-1]
-                civ.type = type
-            ans = input("Change the civilizations's description? (y/n): ")
-            if "y" in ans.lower():
-                description = input("Enter the new description: ")
-                civ.description = description
-            ans = input("Change the civilizations's major religions? (y/n): ")
-            if "y" in ans.lower():
-                religions = input("Enter the new major religions separated by commas: ")
-                civ.religions = religions
-            ans = input("Change the civilizations's major languages? (y/n): ")
-            if "y" in ans.lower():
-                languages = input("Enter the new major languages separated by commas: ")
-                civ.languages = languages
-            ans = input("Change the civilizations's species? You will need to enter the ID of each species again. (y/n): ")
-            if "y" in ans.lower():
-                civ.species_ids = []
-                while True:
-                    print()
-                    scan_print("Available Species:")
-                    list_species()
-                    print()
-                    id_ = input("Enter the ID of a species in the civilization or press Enter to continue: ")
-                    if id_:
-                        id_ = int(id_)
-                        if id_ not in civ.species_ids:
-                            civ.species_ids.append(id_)
-                    else:
-                        break
-            ans = input("Change the civilizations's planets? You will need to enter the ID of each planet again. (y/n): ")
-            if "y" in ans.lower():
-                civ.species_ids = []
-                while True:
-                    print()
-                    scan_print("Available Planets:")
-                    list_planets()
-                    print()
-                    id_ = input("Enter the ID of a planet in the civilization or press Enter to continue: ")
-                    if id_:
-                        id_ = int(id_)
-                        if id_ not in civ.planet_ids:
-                            civ.planet_ids.append(id_)
-                    else:
-                        break
-            civ.update()
-            scan_print("Deploying memetic rewrite")
-            scan_print("...\n",0.5)
-            scan_print(f"Civilization {civ.name} updated successfully!\n{civ}")
-        else:
-            print(f"Civilization {id_} not found")
+                id_ = input("=> ")
+                if id_:
+                    id_ = int(id_)
+                    if id_ not in civ.species_ids:
+                        civ.species_ids.append(id_)
+                else:
+                    break
+        ans = input("Change the civilizations's planets? You will need to enter the ID of each planet again. (y/n): ")
+        if "y" in ans.lower():
+            civ.species_ids = []
+            while True:
+                print()
+                scan_print("Choose planets from the list one at a time to be a part of the civilization:")
+                scan_print("0: Done adding planets")
+                list_items(Planet)
+                print()
+                id_ = input("Enter the ID of a planet in the civilization or press Enter to continue: ")
+                if id_:
+                    id_ = int(id_)
+                    if id_ not in civ.planet_ids:
+                        civ.planet_ids.append(id_)
+                else:
+                    break
+        civ.update()
+        scan_print("Deploying memetic rewrite")
+        scan_print("...\n",0.5)
+        scan_print(f"Civilization {civ.name} updated successfully!\n{civ}")
     except Exception as exc:
         print("Error updating: ", exc)
     print()
     input("Press Enter to return to menu")
     print()
     
-def delete_civilization():
-    list_civilizations()
-    id_ = input("Enter the civilization's id: ")
-    if civ := Civilization.find_by_id(int(id_)):
-        civ.delete()
-        scan_print("Deploying colonizers")
+def update_planet(planet):
+    try:
+        ans = input("Change the planet's name? (y/n): ")
+        if "y" in ans.lower():
+            name = input("Enter the new name: ")
+            planet.name = name
+        ans = input("Change the planet's type? (y/n): ")
+        if "y" in ans.lower():
+            print()
+            scan_print("Select the new type for the planet:")
+            list_items(Planet.types)
+            print()
+            input("=> ")
+            type = Planet.types[int(type)-1]
+            planet.type = type
+        ans = input("Change the planet's description? (y/n): ")
+        if "y" in ans.lower():
+            description = input("Enter the new description: ")
+            planet.description = description
+        ans = input("Change the planet's diameter? (y/n):")
+        if "y" in ans.lower():
+            diameter = input("Enter the new diameter in kilometers: ")
+            planet.diameter = diameter
+        ans = input("Change the planet's mass? (y/n): ")
+        if "y" in ans.lower():
+            mass = input("Enter the new mass in trillions of kilograms: ")
+            planet.mass = mass
+        ans = input("Change the planet's day length? (y/n): ")
+        if "y" in ans.lower():
+            day = input("Enter the new day length in Earth days: ")
+            planet.day = day
+        ans = input("Change the planet's year length? (y/n): ")
+        if "y" in ans.lower():
+            year = input("Enter the new year length in Earth years: ")
+            planet.year = year
+        planet.update()
+        scan_print("Deploying terraforming platforms")
         scan_print("...\n",0.5)
-        scan_print(f"Civilization {id_} deleted")
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Civilization {id_} not found")
+        scan_print(f"Planet {name} updated successfully!\n{planet}")
+    except Exception as e:
+        scan_print(f"Error: {e}")  
     print()
     input("Press Enter to return to menu")
     print()
     
-def find_civilization_by_name():
-    name = input("Enter the name of the civilization: ")
-    if civ := Civilization.find_by_name(name):
-        scan_print(civ)
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Civilization {name} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def find_civilization_by_type():
-    print()
-    scan_print("Available civilization types:")
-    list_types(Civilization)
-    print()
-    input("Enter the new type number for the civilization: ")
-    type = Civilization.types[int(type)-1]
-    if civs := Civilization.find_by_type(type):
-        for civ in civs:
-            scan_print(civ)
-    else:
-        scan_print("...",0.5)
-        scan_print(f"No civilizations of type {type} found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def find_civilization_by_id():
-    id_ = input("Enter the civilization's id: ")
-    if civ := Civilization.find_by_id(int(id_)):
-        scan_print(civ)
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Civilization {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def update_planet():
-    list_planets()
-    id_ = input("Enter the planet's id: ")
-    if planet := Planet.find_by_id(int(id_)):
-        try:
-            ans = input("Change the planet's name? (y/n): ")
-            if "y" in ans.lower():
-                name = input("Enter the new name: ")
-                planet.name = name
-            ans = input("Change the planet's type? (y/n): ")
-            if "y" in ans.lower():
-                print()
-                scan_print("Available planet types:")
-                list_types(Planet)
-                print()
-                input("Enter the new type number for the planet: ")
-                type = Planet.types[int(type)-1]
-                planet.type = type
-            ans = input("Change the planet's description? (y/n): ")
-            if "y" in ans.lower():
-                description = input("Enter the new description: ")
-                planet.description = description
-            ans = input("Change the planet's diameter? (y/n):")
-            if "y" in ans.lower():
-                diameter = input("Enter the new diameter in kilometers: ")
-                planet.diameter = diameter
-            ans = input("Change the planet's mass? (y/n): ")
-            if "y" in ans.lower():
-                mass = input("Enter the new mass in trillions of kilograms: ")
-                planet.mass = mass
-            ans = input("Change the planet's day length? (y/n): ")
-            if "y" in ans.lower():
-                day = input("Enter the new day length in Earth days: ")
-                planet.day = day
-            ans = input("Change the planet's year length? (y/n): ")
-            if "y" in ans.lower():
-                year = input("Enter the new year length in Earth years: ")
-                planet.year = year
-            planet.update()
-            scan_print("Deploying terraforming platforms")
-            scan_print("...\n",0.5)
-            scan_print(f"Planet {name} updated successfully!\n{planet}")
-        except Exception as e:
-            scan_print(f"Error: {e}")  
-        print()
-        input("Press Enter to return to menu")
-        print()
-        
-def delete_planet():
-    list_planets()
-    id_ = input("Enter the planet's id: ")
-    if planet := Planet.find_by_id(int(id_)):
-        planet.delete()
-        scan_print("Deploying cosmic devourers")
+def update_species(species):
+    try:
+        ans = input("Change the species's name? (y/n): ")
+        if "y" in ans.lower():
+            name = input("Enter the new name: ")
+            species.name = name
+        ans = input("Change the species's type? (y/n): ")
+        if "y" in ans.lower():
+            print()
+            scan_print("Select the new type for the species:")
+            list_items(Species.types)
+            print()
+            type = input("=> ")
+            type = Species.types[int(type)-1]
+            species.type = type
+        ans = input("Change the species's description? (y/n): ")
+        if "y" in ans.lower():
+            description = input("Enter the new description: ")
+            species.description = description
+        ans = input("Change the species's home world? (y/n): ")
+        if "y" in ans.lower():
+            print()
+            scan_print("Select the new home world for the species:")
+            list_items(Planet)
+            print()
+            home_world_id = input("=> ")
+            species.home_world_id = home_world_id
+        species.update()
+        scan_print("Deploying CRISPR viruses")
         scan_print("...\n",0.5)
-        scan_print(f"Planet {id_} deleted")
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Planet {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def find_species_by_id():
-    id_ = input("Enter the species's id: ")
-    if species := Species.find_by_id(int(id_)):
-        scan_print(f'{species}')
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Species {id_} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-
-def find_species_by_name():
-    name = input("Enter the species's name: ")
-    if species := Species.find_by_name(name):
-        scan_print(species)
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Species {name} not found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def find_species_by_type():
-    print()
-    scan_print("Available species types:")
-    list_types(Species)
-    print()
-    input("Enter the new type number for the species: ")
-    type = Species.types[int(type)-1]
-    if species := Species.find_by_type(type):
-        for spec in species:
-            scan_print(spec)
-    else:
-        scan_print("...",0.5)
-        scan_print(f"No species of type {type} found")
-    print()
-    input("Press Enter to return to menu")
-    print()
-    
-def update_species():
-    list_species()
-    id_ = input("Enter the species's id: ")
-    if species := Species.find_by_id(int(id_)):
-        try:
-            ans = input("Change the species's name? (y/n): ")
-            if "y" in ans.lower():
-                name = input("Enter the new name: ")
-                species.name = name
-            ans = input("Change the species's type? (y/n): ")
-            if "y" in ans.lower():
-                print()
-                scan_print("Available species types:")
-                list_types(Species)
-                print()
-                type = input("Enter the new type number for the species: ")
-                type = Species.types[int(type)-1]
-                species.type = type
-            ans = input("Change the species's description? (y/n): ")
-            if "y" in ans.lower():
-                description = input("Enter the new description: ")
-                species.description = description
-            ans = input("Change the species's home world? (y/n): ")
-            if "y" in ans.lower():
-                print()
-                scan_print("Available worlds:")
-                list_planets()
-                print()
-                home_world_id = input("Enter the new home world ID: ")
-                species.home_world_id = home_world_id
-            species.update()
-            scan_print("Deploying CRISPR viruses")
-            scan_print("...\n",0.5)
-            scan_print(f"Species {name} updated successfully!\n{species}")
-        except Exception as e:
-            scan_print(f"Error: {e}")  
-        print()
-        input("Press Enter to return to menu")
-        print()
-        
-def delete_species():
-    list_species()
-    id_ = input("Enter the species's id: ")
-    if species := Species.find_by_id(int(id_)):
-        species.delete()
-        scan_print("Deploying Genophage")
-        scan_print("...\n",0.5)
-        scan_print(f"Species {id_} deleted")
-    else:
-        scan_print("...",0.5)
-        scan_print(f"Species {id_} not found")
+        scan_print(f"Species {name} updated successfully!\n{species}")
+    except Exception as e:
+        scan_print(f"Error: {e}")  
     print()
     input("Press Enter to return to menu")
     print()

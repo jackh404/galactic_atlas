@@ -58,6 +58,10 @@ def browse(name):
             if choice != "0":
                 pick_item(name,name.types[int(choice)-1])
         elif choice == "3":
+            system('clear')
+            scan_print(f"""Creating a new {name.__name__}
+                       _________________________________________________
+                       """)
             if name == Star:
                 create_star()
             elif name == Planet:
@@ -69,134 +73,6 @@ def browse(name):
             else:
                 print("Something went wrong.")
                 return
-
-
-        
-
-
-
-
-
-
-
-    
-def stars_menu():
-    while True:
-        system('clear')
-        scan_print(
-            """> Stars | Please select an option:
-    _________________________________________________
-    0. Back to main menu
-    1. List Stars
-    3. Find Stars by Type
-    4. Create Star""",0.01
-        )
-        choice = input("> ")
-        if choice == "0":
-            return
-        elif choice == "1":
-            list_options(Star,"Star")
-        elif choice == "2":
-            find_star_by_id()
-        elif choice == "3":
-            find_star_by_type()
-        elif choice == "4":
-            create_star()
-        elif choice == "5":
-            update_star()
-        elif choice == "6":
-            delete_star()
-            
-def planet_menu():
-    while True:
-        system('clear')
-        scan_print(
-            """> Planets | Please select an option:
-    _________________________________________________
-    0. Back to main menu
-    1. List Planets
-    2. Find Planet by ID
-    3. Find Planet by Type
-    4. Create Planet
-    5. Update Planet
-    6. Delete Planet""",0.01
-        )
-        choice = input("> ")
-        if choice == "0":
-            return
-        elif choice == "1":
-            list_planets()
-        elif choice == "2":
-            find_planet_by_id()
-        elif choice == "3":
-            find_planet_by_type()
-        elif choice == "4":
-            create_planet()
-        elif choice == "5":
-            update_planet()
-        elif choice == "6":
-            delete_planet()
-            
-def species_menu():
-    while True:
-        system('clear')
-        scan_print(
-            """> Species | Please select an option:
-    _________________________________________________
-    0. Back to main menu
-    1. List Species
-    2. Find Species by ID
-    3. Find Species by Type
-    4. Create Species
-    5. Update Species
-    6. Delete Species""",0.01
-        )
-        choice = input("> ")
-        if choice == "0":
-            return
-        elif choice == "1":
-            list_species()
-        elif choice == "2":
-            find_species_by_id()
-        elif choice == "3":
-            find_species_by_type()
-        elif choice == "4":
-            create_species()
-        elif choice == "5":
-            update_species()
-        elif choice == "6":
-            delete_species()
-            
-def civilization_menu():
-    while True:
-        system('clear')
-        scan_print(
-            """> Civilizations | Please select an option:
-    _________________________________________________
-    0. Back to main menu
-    1. List Civilizations
-    2. Find Civilization by ID
-    3. Find Civilization by Type
-    4. Create Civilization
-    5. Update Civilization
-    6. Delete Civilization""",0.01
-        )
-        choice = input("> ")
-        if choice == "0":
-            return
-        elif choice == "1":
-            list_civilizations()
-        elif choice == "2":
-            find_civilization_by_id()
-        elif choice == "3":
-            find_civilization_by_type()
-        elif choice == "4":
-            create_civilization()
-        elif choice == "5":
-            update_civilization()
-        elif choice == "6":
-            delete_civilization()
-          
 
 
 if __name__ == "__main__":
