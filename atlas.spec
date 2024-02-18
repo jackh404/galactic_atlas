@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['lib/atlas.py'],
-    pathex=['lib', 'lib/models'],
+    pathex=[],
     binaries=[],
     datas=[],
     hiddenimports=[],
