@@ -469,7 +469,7 @@ def update_planet(planet):
         planet.update()
         scan_print("Deploying terraforming platforms")
         scan_print("...\n",0.5)
-        scan_print(f"Planet {name} updated successfully!\n{planet}")
+        scan_print(f"Planet {planet.name} updated successfully!\n{planet}")
     except Exception as e:
         scan_print(f"Error: {e}")  
     print()
@@ -506,7 +506,7 @@ def update_species(species):
         species.update()
         scan_print("Deploying CRISPR viruses")
         scan_print("...\n",0.5)
-        scan_print(f"Species {name} updated successfully!\n{species}")
+        scan_print(f"Species {species.name} updated successfully!\n{species}")
     except Exception as e:
         scan_print(f"Error: {e}")  
     print()
